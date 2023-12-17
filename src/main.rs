@@ -27,7 +27,10 @@ fn main() {
 
     match menu(ITEMS) {
         "Ping server" => println!("Pinging server..."),
-        "Ssh into server" => reset!("Sshing into server..."),
+        "Ssh into server" => {
+            reset!("Sshing into server...");
+            ssh::ssh_connect();
+        }
         "Configure" => println!("Configuring..."),
         "Quit" => println!("Quitting..."),
         err => println!("Unknown option: {}", err),

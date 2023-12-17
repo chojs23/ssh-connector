@@ -7,5 +7,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.75"
+exec = "0.3.1"
 inquire = "0.6.2"
+nix = "0.27.1"
 thiserror = "1.0.51"
