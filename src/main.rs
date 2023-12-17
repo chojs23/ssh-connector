@@ -24,15 +24,16 @@ const ITEMS: &[&str] = &["Ping server", "Ssh into server", "Configure", "Quit"];
 
 fn main() {
     inquire::set_global_render_config(get_render_config());
-
-    match menu(ITEMS) {
-        "Ping server" => println!("Pinging server..."),
-        "Ssh into server" => {
-            reset!("Sshing into server...");
-            ssh::ssh_connect();
+    loop {
+        match menu(ITEMS) {
+            "Ping server" => println!("Pinging server..."),
+            "Ssh into server" => {
+                reset!("Sshing into server...");
+                ssh::ssh_connect();
+            }
+            "Configure" => println!("Configuring..."),
+            "Quit" => break,
+            err => println!("Unknown option: {}", err),
         }
-        "Configure" => println!("Configuring..."),
-        "Quit" => println!("Quitting..."),
-        err => println!("Unknown option: {}", err),
     }
 }
