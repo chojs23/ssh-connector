@@ -24,3 +24,25 @@ pub fn ssh_connect() {
         }
     }
 }
+
+pub fn ping_server() {
+    unsafe {
+        let pid = fork();
+
+        match pid {
+            0 => {
+                println!("Excute child process");
+                let err = exec::Command::new("ping")
+                    .args(&["-c", "3", "localhost"])
+                    .exec();
+                println!("Error: {}", err);
+                process::exit(1);
+            }
+            _ => {
+                println!("Parent process");
+                wait(&mut 0 as *mut i32);
+                println!("Child process finished");
+            }
+        }
+    }
+}

@@ -17,7 +17,10 @@ fn menu<'a>(items: &[&'a str]) -> &'a str {
             "Vim keymap is enabled. Use j/k to move up/down, <Enter> to select, <Esc> to quit.",
         )
         .prompt()
-        .unwrap_or("Quit")
+        .unwrap_or_else(|err| {
+            println!("Error: {}", err);
+            "Quit"
+        })
 }
 
 const ITEMS: &[&str] = &["Ping server", "Ssh into server", "Configure", "Quit"];
@@ -26,9 +29,12 @@ fn main() {
     inquire::set_global_render_config(get_render_config());
     loop {
         match menu(ITEMS) {
-            "Ping server" => println!("Pinging server..."),
+            "Ping server" => {
+                println!("Ping server...");
+                ssh::ping_server();
+            }
             "Ssh into server" => {
-                reset!("Sshing into server...");
+                reset!("Ssh into server...");
                 ssh::ssh_connect();
             }
             "Configure" => println!("Configuring..."),
