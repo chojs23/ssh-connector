@@ -1,0 +1,9 @@
+[
+  {
+    "user": "test",
+    "host": "test_host",
+    "addr": "123.123.123.123",
+    "port": 2000,
+    "key_path": null
+  }
+]

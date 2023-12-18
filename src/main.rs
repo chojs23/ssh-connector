@@ -19,7 +19,13 @@ fn main() {
                 reset!("Ssh into server...");
                 ssh::ssh_connect();
             }
-            "Configure" => println!("Configuring..."),
+            "Configure" => {
+                println!("Configure...");
+                if let Err(err) = configure() {
+                    println!("Error: {}", err);
+                }
+            }
+            "Back" => break,
             "Quit" => break,
             err => println!("Unknown option: {}", err),
         }
