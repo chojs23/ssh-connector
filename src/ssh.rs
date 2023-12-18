@@ -1,13 +1,16 @@
 use std::process;
 
-use nix::libc::{fork, wait};
+use nix::{
+    sys::wait,
+    unistd::{fork, ForkResult},
+};
 
 pub fn ssh_connect() {
     unsafe {
         let pid = fork();
 
         match pid {
-            0 => {
+            Ok(ForkResult::Child) => {
                 println!("Excute child process");
                 let err = exec::Command::new("ssh")
                     .arg("root@localhost")
@@ -18,7 +21,7 @@ pub fn ssh_connect() {
             }
             _ => {
                 println!("Parent process");
-                wait(&mut 0 as *mut i32);
+                let _ = wait::wait();
                 println!("Child process finished");
             }
         }
@@ -30,7 +33,7 @@ pub fn ping_server() {
         let pid = fork();
 
         match pid {
-            0 => {
+            Ok(ForkResult::Child) => {
                 println!("Excute child process");
                 let err = exec::Command::new("ping")
                     .args(&["-c", "3", "localhost"])
@@ -40,7 +43,7 @@ pub fn ping_server() {
             }
             _ => {
                 println!("Parent process");
-                wait(&mut 0 as *mut i32);
+                let _ = wait::wait();
                 println!("Child process finished");
             }
         }
