@@ -2,15 +2,8 @@ use anyhow::Context;
 use inquire::ui::{Attributes, Color, ErrorMessageRenderConfig, RenderConfig, StyleSheet};
 use inquire::{Select, Text};
 
-use crate::config::{add_connection, ConnectionConfig};
+use crate::config::ConnectionConfig;
 use crate::errors::AppError;
-
-const CONFIG_ITEMS: &[&str] = &[
-    "Add connection",
-    "Edit connection",
-    "Remove connection",
-    "Back",
-];
 
 #[macro_export]
 macro_rules! reset {
@@ -33,25 +26,34 @@ pub fn get_render_config() -> RenderConfig {
     render_config
 }
 
-pub fn get_input() -> anyhow::Result<ConnectionConfig, anyhow::Error> {
+pub fn get_input(
+    original: Option<ConnectionConfig>,
+) -> anyhow::Result<ConnectionConfig, anyhow::Error> {
+    let initial = original.unwrap_or_default();
+
     let user = Text::new("Username:")
+        .with_default(&initial.user)
         .prompt()
         .context(AppError::ConfigError("Invalid username".to_string()))?;
 
     let host = Text::new("Hostname:")
+        .with_default(&initial.host)
         .prompt()
         .context(AppError::ConfigError("Invalid hostname".to_string()))?;
 
     let addr = Text::new("IP Address of host:")
+        .with_default(&initial.addr)
         .prompt()
         .context(AppError::ConfigError("Invalid address".to_string()))?;
 
     let port = Text::new("Port:")
+        .with_default(&initial.port.to_string())
         .prompt()?
         .parse()
         .context(AppError::ConfigError("Invalid port".to_string()))?;
 
     let key_path = Text::new("(Optional)Path to key - Enter to skip:")
+        .with_default(&initial.key_path.unwrap_or_default().to_string())
         .prompt()
         .context(AppError::ConfigError("Invalid path".to_string()))?;
 
@@ -87,33 +89,4 @@ pub fn menu<'a>(items: &[&'a str]) -> &'a str {
                 "Quit"
             }
         })
-}
-
-pub fn configure() -> anyhow::Result<(), anyhow::Error> {
-    match menu(CONFIG_ITEMS) {
-        "Add connection" => match add_connection() {
-            Ok(_) => Ok(()),
-            Err(err) => Err(err),
-        },
-        "Edit connection" => {
-            println!("Edit connection...");
-            Ok(())
-        }
-        "Remove connection" => {
-            println!("Remove connection...");
-            Ok(())
-        }
-        "Back" => {
-            println!("Back...");
-            Ok(())
-        }
-        "Quit" => {
-            println!("Quit...");
-            Ok(())
-        }
-        _ => {
-            println!("Unknown option");
-            Ok(())
-        }
-    }
 }

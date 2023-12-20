@@ -19,7 +19,7 @@ fn main() {
     loop {
         match menu(ITEMS) {
             "Show configs" => {
-                println!("Config list");
+                println!("---- Config list ----");
                 if let Err(err) = show_configs() {
                     println!("Error: {}", err);
                 }
