@@ -1,5 +1,9 @@
-use std::fs::{self, File};
+use std::{
+    fs::{self, File},
+    process,
+};
 
+use inquire::InquireError;
 use serde::{Deserialize, Serialize};
 
 use crate::renderer::{get_input, menu};
@@ -20,30 +24,30 @@ pub struct ConnectionConfig {
 }
 
 pub fn configure() -> anyhow::Result<(), anyhow::Error> {
-    match menu(CONFIG_ITEMS) {
-        "Add connection" => match add_connection() {
+    match menu("Configuration", CONFIG_ITEMS) {
+        Ok("Add connection") => match add_connection() {
             Ok(_) => Ok(()),
             Err(err) => Err(err),
         },
-        "Edit connection" => match edit_connection() {
+        Ok("Edit connection") => match edit_connection() {
             Ok(_) => Ok(()),
             Err(err) => Err(err),
         },
-        "Remove connection" => {
+        Ok("Remove connection") => {
             println!("Remove connection...");
             Ok(())
         }
-        "Back" => {
+        Ok("Back") => {
             println!("Back...");
             Ok(())
         }
-        "Quit" => {
-            println!("Quit...");
-            Ok(())
+        Err(InquireError::OperationCanceled) => Ok(()),
+        Err(InquireError::OperationInterrupted) => {
+            process::exit(1);
         }
         _ => {
             println!("Unknown option");
-            Ok(())
+            process::exit(1);
         }
     }
 }
@@ -133,7 +137,7 @@ pub fn select_connection() -> anyhow::Result<ConnectionConfig, anyhow::Error> {
         .map(|opt| opt.as_str())
         .collect::<Vec<&str>>();
 
-    let selected = menu(&options);
+    let selected = menu("Select connection", &options)?;
 
     let idx = selections.get(selected).unwrap();
 
@@ -164,7 +168,7 @@ pub fn edit_connection() -> anyhow::Result<(), anyhow::Error> {
         .map(|opt| opt.as_str())
         .collect::<Vec<&str>>();
 
-    let selected = menu(&options);
+    let selected = menu("Select connection to edit", &options)?;
 
     let idx = selections.get(selected).unwrap();
 

@@ -1,6 +1,6 @@
 use anyhow::Context;
 use inquire::ui::{Attributes, Color, ErrorMessageRenderConfig, RenderConfig, StyleSheet};
-use inquire::{Select, Text};
+use inquire::{InquireError, Select, Text};
 
 use crate::config::ConnectionConfig;
 use crate::errors::AppError;
@@ -68,19 +68,13 @@ pub fn get_input(
     Ok(config)
 }
 
-pub fn menu<'a>(items: &[&'a str]) -> &'a str {
-    Select::new("Select what to do", items.to_vec())
+pub fn menu<'a>(message: &str, items: &[&'a str]) -> Result<&'a str, InquireError> {
+    let selection = Select::new(message, items.to_vec())
         .with_vim_mode(true)
         .with_help_message(
             "Vim keymap is enabled. Use j/k to move up/down, <Enter> to select, <Esc> to quit.",
         )
-        .prompt()
-        .unwrap_or_else(|err| match err {
-            inquire::error::InquireError::OperationCanceled => "Back",
-            inquire::error::InquireError::OperationInterrupted => "Quit",
-            _ => {
-                println!("Error: {}", err);
-                "Quit"
-            }
-        })
+        .prompt()?;
+
+    Ok(selection)
 }
