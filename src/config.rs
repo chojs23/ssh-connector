@@ -116,6 +116,7 @@ pub fn add_connection() -> anyhow::Result<(), anyhow::Error> {
 fn write_config(config_file: Vec<ConnectionConfig>) -> anyhow::Result<(), anyhow::Error> {
     let file = fs::OpenOptions::new()
         .write(true)
+        .truncate(true)
         .open("config.json")
         .unwrap();
 
