@@ -38,7 +38,7 @@ fn main() -> anyhow::Result<(), anyhow::Error> {
             Ok("Configure") => {
                 println!("Configure...");
                 if let Err(err) = configure() {
-                    println!("!!Error: {}", err);
+                    println!("Error: {}", err);
                 }
             }
             Ok("Quit") => break,
