@@ -15,12 +15,23 @@ const CONFIG_ITEMS: &[&str] = &[
     "Back",
 ];
 
-#[derive(Debug, Default, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ConnectionConfig {
     pub user: String,
     pub host: String,
     pub port: u16,
     pub key_path: Option<String>,
+}
+
+impl Default for ConnectionConfig {
+    fn default() -> Self {
+        Self {
+            user: "".to_string(),
+            host: "".to_string(),
+            port: 22,
+            key_path: None,
+        }
+    }
 }
 
 pub fn configure() -> anyhow::Result<(), anyhow::Error> {
