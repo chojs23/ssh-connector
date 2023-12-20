@@ -13,7 +13,7 @@ pub fn ssh_connect(config: ConnectionConfig) {
 
         match pid {
             Ok(ForkResult::Child) => {
-                let err = exec::Command::new("ssh")
+                let _err = exec::Command::new("ssh")
                     .arg("-i")
                     .arg(config.key_path.unwrap_or_default())
                     .arg("-p")

@@ -33,10 +33,10 @@ pub fn configure() -> anyhow::Result<(), anyhow::Error> {
             Ok(_) => Ok(()),
             Err(err) => Err(err),
         },
-        Ok("Remove connection") => {
-            println!("Remove connection...");
-            Ok(())
-        }
+        Ok("Remove connection") => match remove_connection() {
+            Ok(_) => Ok(()),
+            Err(err) => Err(err),
+        },
         Ok("Back") => {
             println!("Back...");
             Ok(())
@@ -179,6 +179,43 @@ pub fn edit_connection() -> anyhow::Result<(), anyhow::Error> {
     config_file[*idx] = config;
 
     write_config(config_file)?;
+
+    Ok(())
+}
+
+pub fn remove_connection() -> anyhow::Result<(), anyhow::Error> {
+    let mut config_file = get_config_list().unwrap();
+
+    if config_file.is_empty() {
+        println!("No config found");
+        return Ok(());
+    }
+
+    let selections = config_file
+        .iter()
+        .enumerate()
+        .map(|(idx, config)| (format!("{}@{}", config.user, config.host), idx))
+        .collect::<std::collections::HashMap<String, usize>>();
+
+    let options = config_file
+        .iter()
+        .map(|config| format!("{}@{}", config.user, config.host))
+        .collect::<Vec<String>>();
+
+    let options = options
+        .iter()
+        .map(|opt| opt.as_str())
+        .collect::<Vec<&str>>();
+
+    let selected = menu("Select connection to remove", &options).unwrap();
+
+    let idx = selections.get(selected).unwrap();
+
+    config_file.remove(*idx);
+
+    write_config(config_file)?;
+
+    println!("Connection removed");
 
     Ok(())
 }
