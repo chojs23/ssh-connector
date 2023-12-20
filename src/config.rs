@@ -15,7 +15,6 @@ const CONFIG_ITEMS: &[&str] = &[
 pub struct ConnectionConfig {
     pub user: String,
     pub host: String,
-    pub addr: String,
     pub port: u16,
     pub key_path: Option<String>,
 }
@@ -74,8 +73,7 @@ pub fn show_configs() -> anyhow::Result<(), anyhow::Error> {
     for (idx, config) in config_file.iter().enumerate() {
         println!("{}", idx + 1);
         println!("Username: {}", config.user);
-        println!("Hostname: {}", config.host);
-        println!("IP Address: {}", config.addr);
+        println!("Hostname or IP address: {}", config.host);
         println!("Port: {}", config.port);
         println!(
             "Key Path: {}",
@@ -109,6 +107,37 @@ fn write_config(config_file: Vec<ConnectionConfig>) -> anyhow::Result<(), anyhow
     serde_json::to_writer_pretty(file, &config_file)?;
 
     Ok(())
+}
+
+pub fn select_connection() -> anyhow::Result<ConnectionConfig, anyhow::Error> {
+    let config_file = get_config_list()?;
+
+    if config_file.is_empty() {
+        println!("No config found");
+        return Err(anyhow::Error::msg("No config found"));
+    }
+
+    let selections = config_file
+        .iter()
+        .enumerate()
+        .map(|(idx, config)| (format!("{}@{}", config.user, config.host), idx))
+        .collect::<std::collections::HashMap<String, usize>>();
+
+    let options = config_file
+        .iter()
+        .map(|config| format!("{}@{}", config.user, config.host))
+        .collect::<Vec<String>>();
+
+    let options = options
+        .iter()
+        .map(|opt| opt.as_str())
+        .collect::<Vec<&str>>();
+
+    let selected = menu(&options);
+
+    let idx = selections.get(selected).unwrap();
+
+    Ok(config_file[*idx].clone())
 }
 
 pub fn edit_connection() -> anyhow::Result<(), anyhow::Error> {

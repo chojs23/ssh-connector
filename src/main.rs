@@ -14,7 +14,7 @@ const ITEMS: &[&str] = &[
     "Quit",
 ];
 
-fn main() {
+fn main() -> anyhow::Result<(), anyhow::Error> {
     inquire::set_global_render_config(get_render_config());
     loop {
         match menu(ITEMS) {
@@ -25,12 +25,14 @@ fn main() {
                 }
             }
             "Ping server" => {
+                let config = select_connection()?;
                 println!("Ping server...");
-                ssh::ping_server();
+                ssh::ping_server(config);
             }
             "Ssh into server" => {
+                let config = select_connection()?;
                 reset!("Ssh into server...");
-                ssh::ssh_connect();
+                ssh::ssh_connect(config);
             }
             "Configure" => {
                 println!("Configure...");
@@ -43,4 +45,6 @@ fn main() {
             err => println!("Unknown option: {}", err),
         }
     }
+
+    Ok(())
 }

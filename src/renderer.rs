@@ -36,15 +36,10 @@ pub fn get_input(
         .prompt()
         .context(AppError::ConfigError("Invalid username".to_string()))?;
 
-    let host = Text::new("Hostname:")
+    let host = Text::new("Hostname or IP address:")
         .with_default(&initial.host)
         .prompt()
         .context(AppError::ConfigError("Invalid hostname".to_string()))?;
-
-    let addr = Text::new("IP Address of host:")
-        .with_default(&initial.addr)
-        .prompt()
-        .context(AppError::ConfigError("Invalid address".to_string()))?;
 
     let port = Text::new("Port:")
         .with_default(&initial.port.to_string())
@@ -60,7 +55,6 @@ pub fn get_input(
     let config = ConnectionConfig {
         user,
         host,
-        addr,
         port,
         key_path: {
             if key_path.trim().is_empty() {
