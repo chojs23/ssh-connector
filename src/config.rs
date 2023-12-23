@@ -3,6 +3,7 @@ use std::{
     process,
 };
 
+use homedir::get_my_home;
 use inquire::InquireError;
 use serde::{Deserialize, Serialize};
 
@@ -32,6 +33,19 @@ impl Default for ConnectionConfig {
             key_path: None,
         }
     }
+}
+
+pub fn get_config_path() -> std::path::PathBuf {
+    let home = get_my_home().unwrap().unwrap();
+    let home = home.as_path();
+
+    let ssh_dir = home.join(".ssh-connector/");
+    if !ssh_dir.exists() {
+        println!("Creating .ssh-connector directory at {:?}", home);
+        fs::create_dir(&ssh_dir).expect("Failed to create .ssh-connector directory");
+    }
+
+    ssh_dir.join("config.json")
 }
 
 pub fn configure() -> anyhow::Result<(), anyhow::Error> {
@@ -64,14 +78,15 @@ pub fn configure() -> anyhow::Result<(), anyhow::Error> {
 }
 
 pub fn get_config_list() -> anyhow::Result<Vec<ConnectionConfig>, anyhow::Error> {
-    let config_file = if let Ok(file) = fs::OpenOptions::new().read(true).open("config.json") {
+    let config_file = if let Ok(file) = fs::OpenOptions::new().read(true).open(get_config_path()) {
         serde_json::from_reader::<File, Vec<ConnectionConfig>>(file)?
     } else {
         let file = fs::OpenOptions::new()
             .read(true)
             .write(true)
             .create(true)
-            .open("config.json")?;
+            .open(get_config_path())
+            .expect("Failed to create config file");
         println!("Empty config file created");
 
         serde_json::to_writer_pretty(file, &Vec::<ConnectionConfig>::new())?;
@@ -117,7 +132,7 @@ fn write_config(config_file: Vec<ConnectionConfig>) -> anyhow::Result<(), anyhow
     let file = fs::OpenOptions::new()
         .write(true)
         .truncate(true)
-        .open("config.json")
+        .open(get_config_path())
         .unwrap();
 
     serde_json::to_writer_pretty(file, &config_file)?;

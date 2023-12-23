@@ -2,6 +2,11 @@
 name = "ssh-connector"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+repository = "https://github.com/chojs23/ssh-connector"
+description = "SSH Connector"
+keywords = ["cli", "ssh", "connector"]
+categories = ["commnad-line-utilities"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -13,3 +18,4 @@ nix = { version = "0.27.1", features = ["process"] }
 serde = { version = "1.0.193", features = ["derive"] }
 serde_json = "1.0.108"
 thiserror = "1.0.51"
+homedir = "0.2.1"
